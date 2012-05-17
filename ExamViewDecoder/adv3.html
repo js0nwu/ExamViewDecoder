@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <title>
+            APES Quiz
+        </title>
+        <style>
+            body{
+                background-image: url('minecraftsunset.png');
+                background-repeat: no-repeat;
+                background-size: 100%;
+            }
+
+        </style>
+        <script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript">
+            function firstParse()
+            {
+               
+                var ansIndexRaw = document.getElementById("arrayIndex").value;
+                var sRaw = document.getElementById("arrayValue").value;
+                if (ansIndexRaw.substring(0, 6) == "multi:")
+                {
+                    ansIndexRaw = ansIndexRaw.replace("multi:", "");
+                    var ansIndexSplit = ansIndexRaw.split("`");
+                    var sSplit = sRaw.split("`");
+                    for (var i = 0; i < ansIndexSplit.length; i++)
+                    {
+                        var ansIndex = parseInt(ansIndexSplit[i]);
+                        var value = (ansIndex %31) + 1;
+                        var s = sSplit[i];
+                        decodeValue(ansIndex, value, s);
+                    }
+                }
+                else
+                {
+                var ansIndex = parseInt(ansIndexRaw);
+                var value = (ansIndex %31) + 1;
+                var s = sRaw;
+                decodeValue(ansIndex, value, s);
+                }
+            }
+            function decodeValue(ansIndex, value, s)
+            {
+               
+                var newString;
+                var code;
+                newString = "";
+                for (i=0; i<s.length;i+= 2)
+                {
+                    code = parseInt(s.substring(i, i+2), 16);
+                    newString += String.fromCharCode(code^value);
+                }
+                document.getElementById("ansPara").innerHTML+=newString;
+            }
+            function loadQuiz()
+            {
+                var link = document.getElementById("URLQuiz").value;
+                if (link == "devmode1")
+                {
+                $("#advField").show();
+        		$("#advButton").show();
+        		$("#URLLoad").show();
+        		$("#bscField").hide();
+        		$("#loadQuizButton").hide();
+        		$("#arrayValues").show();
+                }
+                else if (link == "devmode0")
+                {
+                $("#advField").show();
+        		$("#advButton").show();
+        		$("#URLLoad").show();
+        		$("#bscField").show();
+        		$("#loadQuizButton").show();
+        		$("#arrayValues").show();
+                }
+                else if (link == "devmode2")
+                {
+                $("#URLLoad").show();
+                $("#arrayValues").show();
+                }
+                else
+                {
+                var proxlink = "sourceprox.php?url=" + link;
+                $("#URLLoad").load(proxlink);
+                $("#identifyArray").show();
+                $("#bscField").hide();
+                $("#loadQuizButton").hide();
+                }
+            }
+            
+            function splitCode()
+            {
+            	var ansIndexArray = "";
+            	var sArray = "";
+            	var source = document.getElementById("URLLoad").innerHTML;
+            	var splitSource = source.split("ansMap[");
+            	for (i=0; i < splitSource.length; i++)
+            	{
+            		if (i != 0 && i != splitSource.length && i != splitSource.length -1 && i != splitSource.length - 2)
+            		{
+            		var rawSplit = splitSource[i];
+            		var firstSplit = rawSplit.split("';");
+            		var first = firstSplit[0];
+            		var secondSplit = first.split("] = '");
+            		var ansIndex = secondSplit[0];
+            		var s = secondSplit[1];
+            	 	ansIndexArray += ansIndex + "`";
+            		sArray += s + "`";
+            		}
+            	}
+            	ansIndexArray = "multi:" + ansIndexArray.substring(0, ansIndexArray.length - 1);
+            	sArray = sArray.substring(0, sArray.length - 1);
+            	document.getElementById("arrayIndex").value = ansIndexArray;
+            	document.getElementById("arrayValue").value = sArray;
+            	firstParse();
+            	$("#identifyArray").hide();
+            	
+            }
+            
+        </script>
+        <script type="text/javascript">
+        	$(document).ready(function(){
+        		$("#advField").hide();
+        		$("#advButton").hide();
+        		$("#URLLoad").hide();
+        		$("#identifyArray").hide();
+        		$("#arrayValues").hide();
+        		
+        	});
+        </script>
+    </head>
+    <body>
+        <center><h1><b>JavaScript ExamView Decoder [advBuild3]</b></h1></center><br><br>
+        <div id="bscField">
+        Input URL:
+        <input type="text" id="URLQuiz" />
+        </div>
+        <div id="advField">
+        Input arrayIndex:
+        <input type="text" id="arrayIndex" />
+        Input arrayIndex value:
+        <input type="text" id="arrayValue" />
+        </div>
+        <br>
+        <button type="button" onclick="loadQuiz()" id="loadQuizButton">Load Quiz Code</button>
+        <button type="button" onclick="splitCode()" id="identifyArray">Identify Arrays</button>
+        
+        <div id="advButton">
+        <button type="button" onclick="firstParse()">Decode</button>
+        </div>
+        <br>
+        <p id="URLLoad">
+        </p>
+        <div id="arrayValues">
+        	<p id="ansIndexArray">
+        		
+        	</p>
+        	<p id="sArray">
+        		
+        	</p>
+        </div>
+        <br>
+        <p id="ansPara">
+        </p>
+       
+    </body>
+</html>
